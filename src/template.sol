@@ -66,7 +66,7 @@ contract Buyer {
 
   // Automatically withdraws on users' behalves
   function auto_withdraw(address user){
-    // TODO: why wait 1 hour? Do we want to do this?
+    // TODO: why wait 1 hour
     // Only allow automatic withdrawals after users have had a chance to manually withdraw.
     if (!bought_tokens || now < time_bought + 1 hours) throw;
     // Withdraw the user's funds for them.
