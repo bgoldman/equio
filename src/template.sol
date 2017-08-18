@@ -6,11 +6,9 @@ contract ERC20 {
   function balanceOf(address _owner) constant returns (uint256 balance);
 }
 
-contract DecentralandBuyer {
+contract Buyer {
   // Store the amount of ETH deposited by each account.
   mapping (address => uint256) public balances;
-  // Bounty for executing buy.
-  uint256 public bounty;
   // Track whether the contract has bought the tokens yet.
   bool public bought_tokens;
   // Record the time the contract bought the tokens.
@@ -29,18 +27,12 @@ contract DecentralandBuyer {
   // The token address.
   ERC20 public token = // config.get('tokenAddress');
 
-  // Allows the developer or anyone with the password to claim the bounty and shut down everything except withdrawals in emergencies.
+  // Allows anyone with the password to shut down everything except withdrawals in emergencies.
   function activate_kill_switch(string password) {
-    // Only activate the kill switch if the sender is the developer or the password is correct.
-    if (msg.sender != developer && sha3(password) != password_hash) throw;
-    // Store the claimed bounty in a temporary variable.
-    uint256 claimed_bounty = bounty;
-    // Update bounty prior to sending to prevent recursive call.
-    bounty = 0;
+    // Only activate the kill switch if the password is correct.
+    if (sha3(password) != password_hash) throw;
     // Irreversibly activate the kill switch.
     kill_switch = true;
-    // Send the caller their bounty for activating the kill switch.
-    msg.sender.transfer(claimed_bounty);
   }
 
   // Withdraws all ETH deposited or tokens purchased by the user.
@@ -52,7 +44,7 @@ contract DecentralandBuyer {
       uint256 eth_to_withdraw = balances[user];
       // Update the user's balance prior to sending ETH to prevent recursive call.
       balances[user] = 0;
-      // Return the user's funds.  Throws on failure to prevent loss of funds.
+      // Return the user's funds. Throws on failure to prevent loss of funds.
       user.transfer(eth_to_withdraw);
     }
     // Withdraw the user's tokens if the contract has already purchased them.
@@ -67,7 +59,6 @@ contract DecentralandBuyer {
       contract_eth_value -= balances[user];
       // Update the user's balance prior to sending to prevent recursive call.
       balances[user] = 0;
-
       // Send the funds.  Throws on failure to prevent loss of funds.
       if(!token.transfer(user, tokens_to_withdraw)) throw;
     }
@@ -75,52 +66,38 @@ contract DecentralandBuyer {
 
   // Automatically withdraws on users' behalves
   function auto_withdraw(address user){
+    // TODO: why wait 1 hour? Do we want to do this?
     // Only allow automatic withdrawals after users have had a chance to manually withdraw.
     if (!bought_tokens || now < time_bought + 1 hours) throw;
     // Withdraw the user's funds for them.
     withdraw(user, true);
   }
 
-  // Allows developer to add ETH to the buy execution bounty.
-  function add_to_bounty() payable {
-    // Only allow the developer to contribute to the buy execution bounty.
-    if (msg.sender != developer) throw;
-    // Disallow adding to bounty if kill switch is active.
-    if (kill_switch) throw;
-    // Disallow adding to the bounty if contract has already bought the tokens.
-    if (bought_tokens) throw;
-    // Update bounty to include received amount.
-    bounty += msg.value;
-  }
-
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
-  function claim_bounty(){
+  function buy_crowdsale(){
     // Short circuit to save gas if the contract has already bought tokens.
     if (bought_tokens) return;
     // Short circuit to save gas if the earliest buy time hasn't been reached.
     if (block.number < earliest_buy_block) return;
+    // TODO: short circuit based on unix time?
+    // if (now < some target time) return;
     // Short circuit to save gas if kill switch is active.
     if (kill_switch) return;
     // Record that the contract has bought the tokens.
     bought_tokens = true;
     // Record the time the contract bought the tokens.
     time_bought = now;
-    // Store the claimed bounty in a temporary variable.
-    uint256 claimed_bounty = bounty;
-    // Update bounty prior to sending to prevent recursive call.
-    bounty = 0;
     // Record the amount of ETH sent as the contract's current value.
-    contract_eth_value = this.balance - claimed_bounty;
-    // Transfer all the funds (less the bounty) to the crowdsale address
+    contract_eth_value = this.balance;
+    // Transfer all the funds to the crowdsale address
     // to buy tokens.  Throws if the crowdsale hasn't started yet or has
     // already completed, preventing loss of funds.
     if(!sale.call.value(contract_eth_value)()) throw;
-    // Send the caller their bounty for buying tokens for the contract.
-    msg.sender.transfer(claimed_bounty);
   }
 
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
+    // TODO: what's up with this? do we want to do this?
     // Treat near-zero ETH transactions as withdrawal requests.
     if (msg.value <= 1 finney) {
       withdraw(msg.sender, false);
