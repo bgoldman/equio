@@ -1,6 +1,6 @@
 # equio
 
-What if we had a smart contract that people send ETH to and then receive tokens back in proportion to their ETH contributions
+smart contract that people send ETH to and then receive tokens back in proportion to their ETH contributions
 This smart contract is what makes the investment on the group’s behalf in the ETH depositied
 
 Use this as a template, remove the fee, and make it generic
