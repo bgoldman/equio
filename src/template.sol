@@ -19,18 +19,18 @@ contract Buyer {
   bool public kill_switch;
 
   // SHA3 hash of kill switch password.
-  bytes32 password_hash = // config.get('password');
+  bytes32 password_hash = 0x8223cba4d8b54dc1e03c41c059667f6adb1a642a0a07bef5a9d11c18c4f14612; // config.get('password');
   // Earliest time contract is allowed to buy into the crowdsale.
-  uint256 earliest_buy_block = // config.get('block');
+  uint256 earliest_buy_block = 4170700; // config.get('block');
   // The crowdsale address.
-  address public sale = // config.get('saleAddress');
+  address public sale = 0xA66d83716c7CFE425B44D0f7ef92dE263468fb3d; // config.get('saleAddress');
   // The token address.
-  ERC20 public token = // config.get('tokenAddress');
+  ERC20 public token = ERC20(0x0F5D2fB29fb7d3CFeE444a200298f468908cC942); // config.get('tokenAddress');
 
   // Allows anyone with the password to shut down everything except withdrawals in emergencies.
   function activate_kill_switch(string password) {
     // Only activate the kill switch if the password is correct.
-    if (sha3(password) != password_hash) throw;
+    if (sha3(password) != password_hash) revert();
     // Irreversibly activate the kill switch.
     kill_switch = true;
   }
@@ -52,7 +52,7 @@ contract Buyer {
       // Retrieve current token balance of contract.
       uint256 contract_token_balance = token.balanceOf(address(this));
       // Disallow token withdrawals if there are no tokens to withdraw.
-      if (contract_token_balance == 0) throw;
+      if (contract_token_balance == 0) revert();
       // Store the user's token balance in a temporary variable.
       uint256 tokens_to_withdraw = (balances[user] * contract_token_balance) / contract_eth_value;
       // Update the value of tokens currently held by the contract.
@@ -60,7 +60,7 @@ contract Buyer {
       // Update the user's balance prior to sending to prevent recursive call.
       balances[user] = 0;
       // Send the funds.  Throws on failure to prevent loss of funds.
-      if(!token.transfer(user, tokens_to_withdraw)) throw;
+      if(!token.transfer(user, tokens_to_withdraw)) revert();
     }
   }
 
@@ -68,9 +68,9 @@ contract Buyer {
   function auto_withdraw(address user){
     // TODO: why wait 1 hour
     // Only allow automatic withdrawals after users have had a chance to manually withdraw.
-    if (!bought_tokens || now < time_bought + 1 hours) throw;
+    if (!bought_tokens || now < time_bought + 1 hours) revert();
     // Withdraw the user's funds for them.
-    withdraw(user, true);
+    withdraw(user);
   }
 
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
@@ -92,7 +92,7 @@ contract Buyer {
     // Transfer all the funds to the crowdsale address
     // to buy tokens.  Throws if the crowdsale hasn't started yet or has
     // already completed, preventing loss of funds.
-    if(!sale.call.value(contract_eth_value)()) throw;
+    if(!sale.call.value(contract_eth_value)()) revert();
   }
 
   // A helper function for the default function, allowing contracts to interact.
@@ -100,14 +100,14 @@ contract Buyer {
     // TODO: what's up with this? do we want to do this?
     // Treat near-zero ETH transactions as withdrawal requests.
     if (msg.value <= 1 finney) {
-      withdraw(msg.sender, false);
+      withdraw(msg.sender);
     }
     // Deposit the user's funds for use in purchasing tokens.
     else {
       // Disallow deposits if kill switch is active.
-      if (kill_switch) throw;
+      if (kill_switch) revert();
       // Only allow deposits if the contract hasn't already purchased the tokens.
-      if (bought_tokens) throw;
+      if (bought_tokens) revert();
       // Update records of deposited ETH to include the received amount.
       balances[msg.sender] += msg.value;
     }
@@ -116,7 +116,7 @@ contract Buyer {
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Prevent sale contract from refunding ETH to avoid partial fulfillment.
-    if (msg.sender == address(sale)) throw;
+    if (msg.sender == address(sale)) revert();
     // Delegate to the helper function.
     default_helper();
   }
