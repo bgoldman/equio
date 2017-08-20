@@ -4,40 +4,27 @@ Smart contract to invest in ICOs and distribute ICO tokens back to investors in 
 
 ### Usage
 
-Deploy this smart contract.
-Call the contract create sub contract function with params for
-- list of allowed investor addresses
-- ICO name
-- ICO deposit address
-- One of:
-  - Unix timestamp when to invest in the ICO
-  - Block number when to invest in ICO
-- Max investment amount
+Deploy this EquioGenesis contract.
+Call the EquioGenesis generate function with params for
 
-Get the address of the sub contract?
+`string _name` - name of the sale
+`address _sale`, - address of the sale
+`address _token`, - token address the sale will distribute
+`bytes32 _password_hash`, - hash of the kill switch password
+`uint256 _earliest_buy_block`, - earliest block that the funds can be sent to the sale. If this is not needed set to 0.
+`uint256 _earliest_buy_time` - earliest unix time that the funds can be sent to the sale. If this is not needed set to 0.
 
-Verify the sub-contract bytecode / opcode matches the expected code
+Record the address of the new Equio contract returned by the generate function.
 
-Send Ether to the sub-contract address?
+Share the address and password SHA3 hash or password of the new Equio contract.
 
-Design
-- setup
-  - initialize list of allowed addresses
+Investors should independently verify the sub-contract bytecode / opcode matches the expected code using something like https://etherscan.io/verifyContract
 
-- cleanup
-  - selfdestruct
-  - refund remaining ether proportionally to all investing addresses
-  - no ether should remain at this point.
-  - use suicide or another operation which uses negative gas
+Note: this is not implemented as it may be insecure.
+`Investors should call the verifyPassword method to ensure they have kill-permissions over the contract.`
 
+Investments must be made with an amount over 1 finney. Amounts less than this will trigger a withdrawal.
 
-- Seed notes
+Anyone with the password can call the kill switch.
 
-  Use this as a template, remove the fee, and make it generic
-  https://etherscan.io/address/decentraland.icobuyer.eth#code
-
-  instead of the claim_bounty function? That function was written to allow many users to race to execute the contract to make sure it executes in the very first block. But for pre-ICOs we don't race. So what triggers the send? Maybe a time stamp?
-
-  We also need a deployment script that runs as a command line tool where we enter the ICO name, timestamp of future send, max total amount, and ICO address, and then it modifies the template and deploys it
-
-  npm run deploy -- --iconame decentraland --sendtime 1503014400 --maxamount 250 --address 0xCe5cEF13215534d5C1852f3fC81E1B2aeC0D1DE1
+Someone must call the buy_sale function to trigger sending funds from the contract to the ICO address.
