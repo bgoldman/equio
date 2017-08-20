@@ -27,10 +27,6 @@ Share the address and password SHA3 hash or password of the new Equio contract.
 
 Investors should independently verify the sub-contract bytecode / opcode matches the expected code using something like https://etherscan.io/verifyContract
 
-Note: this is not implemented as it may be insecure.
-
-`Investors should call the verifyPassword method to ensure they have kill-permissions over the contract.`
-
 Investments must be made with an amount over 1 finney. Amounts less than this will trigger a withdrawal.
 
 Anyone with the password can call the kill switch.
