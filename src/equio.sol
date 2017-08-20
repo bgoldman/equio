@@ -39,7 +39,7 @@ contract Equio {
     bytes32 _password_hash,
     uint256 _earliest_buy_block,
     uint256 _earliest_buy_time
-  ) payable {
+  ) {
       creator = msg.sender;
       name = _name;
       sale = _sale;
