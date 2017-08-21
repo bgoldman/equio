@@ -22,15 +22,15 @@ contract Equio {
   // The sale name.
   string name;
   // The sale address.
-  address public sale; // = 0xA66d83716c7CFE425B44D0f7ef92dE263468fb3d; // config.get('saleAddress');
+  address public sale;
   // The token address.
-  ERC20 public token; // = ERC20(0x0F5D2fB29fb7d3CFeE444a200298f468908cC942); // config.get('tokenAddress');
+  ERC20 public token;
   // SHA3 hash of kill switch password.
-  bytes32 password_hash; // = 0x8223cba4d8b54dc1e03c41c059667f6adb1a642a0a07bef5a9d11c18c4f14612; // config.get('password');
+  bytes32 password_hash;
   // Earliest block contract is allowed to buy into the crowdsale.
-  uint256 earliest_buy_block; // = 4170700; // config.get('block');
+  uint256 earliest_buy_block;
   // Earliest time contract is allowed to buy into the crowdsale. (unix time)
-  uint256 earliest_buy_time; // config.get('block');
+  uint256 earliest_buy_time;
 
   function Equio(
     string _name,
@@ -78,9 +78,7 @@ contract Equio {
   }
 
   // Withdraws for a given users. Callable by anyone
-  // TODO: Do we want this?
   function auto_withdraw(address user){
-    // TODO: why wait 1 hour
     // Only allow automatic withdrawals after users have had a chance to manually withdraw.
     require (bought_tokens && now > time_bought + 1 hours);
     // Withdraw the user's funds for them.
@@ -105,7 +103,6 @@ contract Equio {
     // Transfer all the funds to the crowdsale address
     // to buy tokens.  Throws if the crowdsale hasn't started yet or has
     // already completed, preventing loss of funds.
-    // TODO: is this always the correct way to send ETH to a sale? (It should be!)
     // This calls the sale contracts fallback function.
     require(sale.call.value(contract_eth_value)());
   }
