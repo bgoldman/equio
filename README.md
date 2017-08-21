@@ -5,7 +5,7 @@ Smart contract to invest in ICOs and distribute ICO tokens back to investors in 
 ### Usage
 
 - This contract is located at `address will be provided when functionality is fully tested`
-- Call the generate function of the contract with values for
+- Call the generate function of the contract with gas limit ~600000 and values for
 
   `string _name` : Name of the sale. Used for logging and events only.
 
