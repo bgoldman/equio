@@ -15,9 +15,9 @@ Smart contract to invest in ICOs and distribute ICO tokens back to investors in 
 
   `bytes32 _password_hash` : Keccak256 hash of the kill switch password. Must start with 0x.
 
-  `uint256 _earliest_buy_block` : Earliest block that sale address will accecpt funds. If this is not needed set to 0.
+  `uint256 _earliest_buy_block` : Earliest block that sale address will accecpt funds. Set to 0 if not needed.
 
-  `uint256 _earliest_buy_time` : Earliest unix time that sale address will accecpt funds. If this is not needed set to 0.
+  `uint256 _earliest_buy_time` : Earliest unix time that sale address will accecpt funds. Set to 0 if not needed.
 
 
 - Record the address of the new Equio contract returned by the generate function.
