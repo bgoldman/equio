@@ -8,13 +8,13 @@ Deploy this EquioGenesis contract.
 Call the EquioGenesis generate function with params for
 
 
-`string _name` - name of the sale
+`string _name` - Name of the sale. Used for logging and events only.
 
-`address _sale` - address of the sale
+`address _sale` - Address of the sale. Must start with 0x.
 
-`address _token` - token address the sale will distribute
+`address _token` - Address of the ERC20 token the sale will distribute. Must start with 0x.
 
-`bytes32 _password_hash` - hash of the kill switch password
+`bytes32 _password_hash` - hash of the kill switch password. Must start with 0x.
 
 `uint256 _earliest_buy_block` - earliest block that the funds can be sent to the sale. If this is not needed set to 0.
 
