@@ -90,10 +90,10 @@ contract Equio {
   // Buys tokens in the sale and rewards the caller, callable by anyone.
   function buy_sale(){
     // Short circuit to save gas if the contract has already bought tokens.
-    require(bought_tokens);
+    require(!bought_tokens);
     // Short circuit to save gas if the earliest buy time and block hasn't been reached.
-    require(!block.number < earliest_buy_block);
-    require(!now < earliest_buy_time);
+    require(block.number >= earliest_buy_block);
+    require(now >= earliest_buy_time);
     // Short circuit to save gas if kill switch is active.
     require(!kill_switch);
     // Record that the contract has bought the tokens.
@@ -126,7 +126,6 @@ contract Equio {
     } else { // Deposit the user's funds for use in purchasing tokens.
       // Disallow deposits if kill switch is active.
       require (!kill_switch);
-      // TODO: do we care about this? Why not allow running investment?
       // Only allow deposits if the contract hasn't already purchased the tokens.
       require (!bought_tokens);
       // Update records of deposited ETH to include the received amount.
@@ -136,7 +135,6 @@ contract Equio {
 
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
-    // TODO: How to handle sale contract refunding ETH?
     // Prevent sale contract from refunding ETH to avoid partial fulfillment.
     require(msg.sender != address(sale));
     // Delegate to the helper function.
