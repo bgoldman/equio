@@ -21,9 +21,9 @@ Smart contract to invest in ICOs and distribute ICO tokens back to investors in 
 
 
 - Record the address of the new Equio contract returned by the generate function.
-- Use https://etherscan.io/verifyContract to verify the contract source code.
+- Use https://etherscan.io/verifyContract to verify the generated contract source code.
 - Share the new Equio contract's address and password.
-- Investors should look up the contract address received to check for the expected verified source code.
+- Investors should look up the contract address received to check for the expected source code.
 - Investments must be made with an amount over 1 finney. Amounts less than this will trigger a withdrawal.
 - Anyone with the password can call the kill switch function.
 - Someone must call the buy_sale function to trigger sending funds from the contract to the ICO address.
