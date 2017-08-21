@@ -92,8 +92,8 @@ contract Equio {
     // Short circuit to save gas if the contract has already bought tokens.
     require(bought_tokens);
     // Short circuit to save gas if the earliest buy time and block hasn't been reached.
-    require(block.number < earliest_buy_block);
-    require(now < earliest_buy_time);
+    require(!block.number < earliest_buy_block);
+    require(!now < earliest_buy_time);
     // Short circuit to save gas if kill switch is active.
     require(!kill_switch);
     // Record that the contract has bought the tokens.
