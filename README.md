@@ -10,13 +10,13 @@ Call the EquioGenesis generate function with params for
 
 `string _name` - name of the sale
 
-`address _sale`, - address of the sale
+`address _sale` - address of the sale
 
-`address _token`, - token address the sale will distribute
+`address _token` - token address the sale will distribute
 
-`bytes32 _password_hash`, - hash of the kill switch password
+`bytes32 _password_hash` - hash of the kill switch password
 
-`uint256 _earliest_buy_block`, - earliest block that the funds can be sent to the sale. If this is not needed set to 0.
+`uint256 _earliest_buy_block` - earliest block that the funds can be sent to the sale. If this is not needed set to 0.
 
 `uint256 _earliest_buy_time` - earliest unix time that the funds can be sent to the sale. If this is not needed set to 0.
 
